@@ -36,6 +36,18 @@ public class Price implements Serializable {
     @Column
     private long value;
 
+    public Price() {
+    }
+
+    public Price(Price price) {
+        this.productCode = price.getProductCode();
+        this.number = price.getNumber();
+        this.depart = price.getDepart();
+        this.begin = price.getBegin();
+        this.end = price.getEnd();
+        this.value = price.getValue();
+    }
+
     public Long getId() {
         return id;
     }
@@ -114,5 +126,31 @@ public class Price implements Serializable {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Price price = (Price) o;
+
+        if (getNumber() != price.getNumber()) return false;
+        if (getDepart() != price.getDepart()) return false;
+        if (getValue() != price.getValue()) return false;
+        if (getProductCode() != null ? !getProductCode().equals(price.getProductCode()) : price.getProductCode() != null)
+            return false;
+        if (getBegin() != null ? !getBegin().equals(price.getBegin()) : price.getBegin() != null) return false;
+        return !(getEnd() != null ? !getEnd().equals(price.getEnd()) : price.getEnd() != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getProductCode() != null ? getProductCode().hashCode() : 0;
+        result = 31 * result + getNumber();
+        result = 31 * result + getDepart();
+        result = 31 * result + (getBegin() != null ? getBegin().hashCode() : 0);
+        result = 31 * result + (getEnd() != null ? getEnd().hashCode() : 0);
+        result = 31 * result + (int) (getValue() ^ (getValue() >>> 32));
+        return result;
+    }
 }

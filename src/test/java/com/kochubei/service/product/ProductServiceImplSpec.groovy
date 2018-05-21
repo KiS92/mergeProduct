@@ -11,14 +11,20 @@ class ProductServiceImplSpec extends Specification {
     PriceServiceImpl productService
 
     Price createPrice(opts = [:]) {
-        Mock(Price) {
-            getProductCode() >> opts.productCode
-            getNumber() >> opts.number
-            getDepart() >> opts.depart
-            getBegin() >> opts.begin
-            getEnd() >> opts.end
-            getValue() >> opts.value
-        }
+        def price = new Price()
+        if(opts.productCode != null)
+        price.setProductCode(opts.productCode)
+        if(opts.number != null)
+        price.setNumber(opts.number)
+        if(opts.depart != null)
+        price.setDepart(opts.depart)
+        if(opts.begin != null)
+        price.setBegin(opts.begin)
+        if(opts.end != null)
+        price.setEnd(opts.end)
+        if(opts.value != null)
+        price.setValue(opts.value)
+        return price
     }
 
     @Test
@@ -143,9 +149,61 @@ class ProductServiceImplSpec extends Specification {
     }
 
     @Test
-    def "[mergePrices] return full prices when current prices value not equals new prices value"() {
+    def "[mergePrices] return updated price when current prices value equals new prices value and newPrice-end after currentPrice-end "() {
+        given:
+        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,26), value: 100)
+        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,27), value: 100)
+        def currentPrices = [priceProductOne]
+        def newPrices = [priceProductTwo]
+
+
+        when:
+        def result = productService.mergePrices(currentPrices, newPrices)
+
+        then:
+        result.size() == 1
+        def expected = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,27), value: 100)
+        result.contains(expected)
+    }
+
+
+    @Test
+    def "[mergePrices] return updated price when current prices value equals new prices value and newPrice-begin before currentPrice-begin "() {
+        given:
+        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,26), value: 100)
+        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,25), value: 100)
+        def currentPrices = [priceProductOne]
+        def newPrices = [priceProductTwo]
+
+        when:
+        def result = productService.mergePrices(currentPrices, newPrices)
+
+        then:
+        result.size() == 1
+        def expected = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,26), value: 100)
+        result.contains(expected)
+    }
+
+    @Test
+    def "[mergePrices] return full prices when current prices value not equals new prices value and currentPrice dates before newPrice dates"() {
         given:
         def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,24), value: 100)
+        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,25), end: new Date(92,05,27), value: 101)
+        def currentPrices = [priceProductOne]
+        def newPrices = [priceProductTwo]
+
+        when:
+        def result = productService.mergePrices(currentPrices, newPrices)
+
+        then:
+        result.size() == 2
+        result.containsAll([priceProductTwo, priceProductOne])
+    }
+
+    @Test
+    def "[mergePrices] return full prices when current prices value not equals new prices value and currentPrice dates after newPrice dates"() {
+        given:
+        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,25), end: new Date(92,05,27), value: 100)
         def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,24), value: 101)
         def currentPrices = [priceProductOne]
         def newPrices = [priceProductTwo]
@@ -158,21 +216,62 @@ class ProductServiceImplSpec extends Specification {
         result.containsAll([priceProductTwo, priceProductOne])
     }
 
-
     @Test
-    def "[mergePrices] return update prices when current prices value equals new prices value and currentPrice-end after newPrice-begin "() {
+    def "[mergePrices] return added prices when current prices value not equals new prices value and newPrice dates into currentPrice dates"() {
         given:
-        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,27), value: 100)
-        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,24), value: 100)
+        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,27), value: 100)
+        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,24), value: 101)
         def currentPrices = [priceProductOne]
         def newPrices = [priceProductTwo]
-        def expected = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,24), value: 100)
 
         when:
         def result = productService.mergePrices(currentPrices, newPrices)
 
         then:
-        result.size() == 1
-        result.containsAll([expected])
+        result.size() == 3
+        def expectedOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,23), value: 100)
+        def expectedTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,24), value: 101)
+        def expectedThree = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,24), end: new Date(92,05,27), value: 100)
+        result.contains(expectedOne)
+        result.contains(expectedTwo)
+        result.contains(expectedThree)
+    }
+
+    @Test
+    def "[mergePrices] return full prices when current prices value not equals new prices value and newPrice dates part before currentPrice dates"() {
+        given:
+        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,25), value: 100)
+        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,24), value: 101)
+        def currentPrices = [priceProductOne]
+        def newPrices = [priceProductTwo]
+
+        when:
+        def result = productService.mergePrices(currentPrices, newPrices)
+
+        then:
+        result.size() == 2
+        def expectedOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,24), value: 101)
+        def expectedTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,24), end: new Date(92,05,25), value: 100)
+        result.contains(expectedOne)
+        result.contains(expectedTwo)
+    }
+
+    @Test
+    def "[mergePrices] return full prices when current prices value not equals new prices value and newPrice dates part after currentPrice dates"() {
+        given:
+        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,25), value: 100)
+        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,24), end: new Date(92,05,27), value: 101)
+        def currentPrices = [priceProductOne]
+        def newPrices = [priceProductTwo]
+
+        when:
+        def result = productService.mergePrices(currentPrices, newPrices)
+
+        then:
+        result.size() == 2
+        def expectedOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,24), value: 100)
+        def expectedTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,24), end: new Date(92,05,27), value: 101)
+        result.contains(expectedOne)
+        result.contains(expectedTwo)
     }
 }
