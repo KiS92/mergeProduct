@@ -33,11 +33,7 @@ public class PriceServiceImpl implements PriceService {
                 List<Price> modifiedPrices = new ArrayList<>();
                 for (final Price localPrice : localPrices) {
                     if (localPrice.getDepart() == newPrice.getDepart() && localPrice.getNumber() == newPrice.getNumber()) {
-                        if (
-                                newPrice.getEnd().before(localPrice.getBegin())
-                                        ||
-                                        newPrice.getBegin().after(localPrice.getEnd())
-                                ) {
+                        if (newPrice.getEnd().before(localPrice.getBegin()) || newPrice.getBegin().after(localPrice.getEnd())) {
                             //если новая цена заканчивается до локальной или начинается после текущей - добавляем новую цену
                             priceForAdd.add(newPrice);
                         } else {
