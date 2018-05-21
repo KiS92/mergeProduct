@@ -18,7 +18,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
-            <version>5.0.6.RELEASE</version>
+            <version>3.0.5.RELEASE</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
@@ -26,6 +26,17 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.1</version>
+        </dependency>
+
 
         <!--logging START-->
         <dependency>
@@ -62,6 +73,17 @@
             <artifactId>groovy-all</artifactId>
             <version>2.4.7</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.blogspot.toomuchcoding</groupId>
+            <artifactId>spock-subjects-collaborators-extension</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/cglib/cglib-nodep -->
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>3.2.6</version>
         </dependency>
         <!--test END-->
     </dependencies>
