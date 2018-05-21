@@ -39,6 +39,15 @@ public class Price implements Serializable {
     public Price() {
     }
 
+    public Price(String productCode, int number, int depart, Date begin, Date end, long value) {
+        this.productCode = productCode;
+        this.number = number;
+        this.depart = depart;
+        this.begin = begin;
+        this.end = end;
+        this.value = value;
+    }
+
     public Price(Price price) {
         this.productCode = price.getProductCode();
         this.number = price.getNumber();
