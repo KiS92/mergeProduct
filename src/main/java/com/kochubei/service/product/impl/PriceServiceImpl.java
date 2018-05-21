@@ -29,8 +29,8 @@ public class PriceServiceImpl implements PriceService {
             final String key = newPrice.getProductCode();
             if (productPrices.containsKey(key)) {
                 final List<Price> localPrices = productPrices.get(key);
-                Set<Price> priceForAdd = new HashSet<>();
-                List<Price> modifiedPrices = new ArrayList<>();
+                final Set<Price> priceForAdd = new HashSet<>();
+                final List<Price> modifiedPrices = new ArrayList<>();
                 for (final Price localPrice : localPrices) {
                     if (localPrice.getDepart() == newPrice.getDepart() && localPrice.getNumber() == newPrice.getNumber()) {
                         if (newPrice.getEnd().before(localPrice.getBegin()) || newPrice.getBegin().after(localPrice.getEnd())) {
@@ -49,7 +49,7 @@ public class PriceServiceImpl implements PriceService {
                                 //если значения цен отличаются, добавляется новая цена, а период действия старой цены уменьшается согласно периоду новой цены.
                                 priceForAdd.add(newPrice);
                                 if (newPrice.getBegin().after(localPrice.getBegin()) && newPrice.getEnd().before(localPrice.getEnd())) {
-                                    Price price = new Price(localPrice);
+                                    final Price price = new Price(localPrice);
                                     price.setBegin(newPrice.getEnd());
                                     priceForAdd.add(price);
                                     localPrice.setEnd(newPrice.getBegin());
@@ -78,7 +78,7 @@ public class PriceServiceImpl implements PriceService {
             }
         }
 
-        List<Price> result = new ArrayList<>();
+        final List<Price> result = new ArrayList<>();
         for (Map.Entry<String, List<Price>> entry : productPrices.entrySet()) {
             result.addAll(entry.getValue());
         }
@@ -92,7 +92,7 @@ public class PriceServiceImpl implements PriceService {
             if (productPrices.containsKey(key)) {
                 productPrices.get(key).add(price);
             } else {
-                List<Price> value = new ArrayList<>();
+                final List<Price> value = new ArrayList<>();
                 value.add(price);
                 productPrices.put(key, value);
             }
