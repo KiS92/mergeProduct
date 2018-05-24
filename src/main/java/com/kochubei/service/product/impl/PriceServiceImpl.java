@@ -47,16 +47,27 @@ public class PriceServiceImpl implements PriceService {
                                 }
                             } else {
                                 //если значения цен отличаются, добавляется новая цена, а период действия старой цены уменьшается согласно периоду новой цены.
-                                priceForAdd.add(newPrice);
                                 if (newPrice.getBegin().after(localPrice.getBegin()) && newPrice.getEnd().before(localPrice.getEnd())) {
                                     final Price price = new Price(localPrice);
                                     price.setBegin(newPrice.getEnd());
                                     priceForAdd.add(price);
                                     localPrice.setEnd(newPrice.getBegin());
-                                } else if (newPrice.getBegin().before(localPrice.getBegin()) && newPrice.getEnd().before(localPrice.getEnd()) && newPrice.getEnd().after(localPrice.getBegin())) {
+                                    priceForAdd.add(newPrice);
+                                }
+                                else if (newPrice.getBegin().before(localPrice.getBegin()) && newPrice.getEnd().after(localPrice.getEnd())) {
+                                    final Price price = new Price(newPrice);
+                                    price.setEnd(localPrice.getBegin());
+                                    priceForAdd.add(price);
+
+                                    newPrice.setBegin(localPrice.getEnd());
+                                    priceForAdd.add(newPrice);
+                                }
+                                else if (newPrice.getBegin().before(localPrice.getBegin()) && newPrice.getEnd().before(localPrice.getEnd()) && newPrice.getEnd().after(localPrice.getBegin())) {
                                     localPrice.setBegin(newPrice.getEnd());
+                                    priceForAdd.add(newPrice);
                                 } else if (newPrice.getBegin().after(localPrice.getBegin()) && newPrice.getBegin().before(localPrice.getEnd()) && newPrice.getEnd().after(localPrice.getEnd())) {
                                     localPrice.setEnd(newPrice.getBegin());
+                                    priceForAdd.add(newPrice);
                                 }
                             }
                         }

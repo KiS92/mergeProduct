@@ -238,6 +238,27 @@ class ProductServiceImplSpec extends Specification {
     }
 
     @Test
+    def "[mergePrices] return added prices when current prices value not equals new prices value and newPrice dates outer currentPrice dates"() {
+        given:
+        def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,27), value: 100)
+        def priceProductTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,19), end: new Date(92,05,29), value: 101)
+        def currentPrices = [priceProductOne]
+        def newPrices = [priceProductTwo]
+
+        when:
+        def result = productService.mergePrices(currentPrices, newPrices)
+
+        then:
+        result.size() == 3
+        def expectedOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,19), end: new Date(92,05,20), value: 101)
+        def expectedTwo = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,20), end: new Date(92,05,27), value: 100)
+        def expectedThree = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,27), end: new Date(92,05,29), value: 101)
+        result.contains(expectedOne)
+        result.contains(expectedTwo)
+        result.contains(expectedThree)
+    }
+
+    @Test
     def "[mergePrices] return full prices when current prices value not equals new prices value and newPrice dates part before currentPrice dates"() {
         given:
         def priceProductOne = createPrice(productCode: "1", depart: 1, number: 1, begin: new Date(92,05,23), end: new Date(92,05,25), value: 100)
